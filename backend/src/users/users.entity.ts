@@ -1,24 +1,22 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Users {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn()
+  user_id: number;
+
+  @Column({
     type: 'varchar',
     length: 16,
+    unique: true,
   })
   username: string;
 
   @Column({
     type: 'varchar',
-    length: 20,
+    length: 50,
   })
-  first_name: string;
-
-  @Column({
-    type: 'varchar',
-    length: 20,
-  })
-  last_name: string;
+  display_name: string;
 
   @Column({
     type: 'varchar',
