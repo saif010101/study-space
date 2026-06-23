@@ -5,6 +5,7 @@ import { Users } from './users.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { registerFormSchema } from '../zod-schemas/registerFormSchema';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
       display_name: createUserDto.display_name,
       email: createUserDto.email,
       password: hashedPassword,
-      profile_url: createUserDto.profile_url,
+      profile_url: 'harcoded for now fix later',
     });
   }
 
@@ -30,6 +31,10 @@ export class UsersService {
         username: username,
       },
     });
+  }
+
+  validateUserInput(createUserDto: CreateUserDto) {
+    return registerFormSchema.safeParse(createUserDto);
   }
 
 }

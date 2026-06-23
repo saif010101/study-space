@@ -10,7 +10,6 @@ import {
 
 import { Input } from "#components/ui/input";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import zod from "zod";
 import {
   Field,
   FieldDescription,
@@ -19,7 +18,11 @@ import {
 } from "#components/ui/field";
 import { useState } from "react";
 import {registerErrorMessages} from "../utils/registerErrorMessages.ts";
-
+import { registerFormSchema } from "../schemas/registerFormSchema.ts";
+import {useMutation} from "@tanstack/react-query";
+import {UserAPIService} from "../services/UserAPIService.ts";
+import type {RegisterFormData} from "../types/RegisterFormData.ts";
+import {Spinner} from "#components/ui/spinner";
 
 const initialErrorMapState = new Map([
   ["username", true],
@@ -28,31 +31,30 @@ const initialErrorMapState = new Map([
   ["password", true],
 ]);
 
-const Register = () => {
-  const [validationMap, setValidationMap] = useState(initialErrorMapState);
 
-  const formDataSchema = zod.object({
-    username: zod
-      .string()
-      .toLowerCase()
-      .regex(/^[a-z0-9]{5,20}$/),
-    display_name: zod
-      .string()
-      .toLowerCase()
-      .regex(/^[a-z]{5,50}$/),
-    email: zod
-      .string()
-      .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-    password: zod.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/),
+const Register = () => {
+  const [usernameTaken,setUsernameTaken] = useState(false);
+  const [validationMap, setValidationMap] = useState(initialErrorMapState);
+  const registerMutation = useMutation({
+    mutationFn: (userData: RegisterFormData) => UserAPIService.registerUser(userData)
   });
+
+  const usernameMutation = useMutation({
+    mutationFn: (username : string) => UserAPIService.getUser(username),
+    onSuccess: () => {
+        setUsernameTaken(true);
+    },
+    onError: () => {
+      setUsernameTaken(false);
+    }
+  });
+
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    console.log(formData);
-    const data = Object.fromEntries(formData.entries());
-    const result = formDataSchema.safeParse(data);
-    console.log(result.error)
+    const data : RegisterFormData = Object.fromEntries(formData.entries()) as RegisterFormData;
+    const result = registerFormSchema.safeParse(data);
     const newValidationMap = new Map<string, boolean>(initialErrorMapState);
     if (result.error) {
       for (let i = 0; i < result.error.issues.length; i++) {
@@ -62,10 +64,29 @@ const Register = () => {
       }
     }
     setValidationMap(newValidationMap);
+
+    if (result.success) {
+      registerMutation.mutate(data);
+    }
   };
 
+  const handleUsernameChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+    const username = event.target.value;
+    const usernameSchema = registerFormSchema.shape.username;
+    const newValidationMap = new Map<string, boolean>(validationMap);
+    if (usernameSchema.safeParse(username).error) {
+        newValidationMap.set('username',false);
+        setValidationMap(newValidationMap);
+        return;
+    } else {
+      newValidationMap.set('username',true);
+      setValidationMap(newValidationMap);
+    }
+    usernameMutation.mutate(username);
+  }
+
   return (
-    <Card className="grow-1 max-w-[480px] justify-center border-1b max-[479px]:h-screen [--card-spacing:--spacing(10)]">
+    <Card className="grow max-w-[480px] justify-center border-1b max-[479px]:h-screen [--card-spacing:--spacing(10)]">
       <CardHeader>
         <CardTitle>Create an Account</CardTitle>
         <CardDescription>
@@ -87,7 +108,7 @@ const Register = () => {
                 />
                 {!validationMap.get('email') && (
                   <FieldDescription className="text-red-500">
-                    {errorMessages.get('email')}
+                    {registerErrorMessages.get('email')}
                   </FieldDescription>
                 )}
               </Field>
@@ -100,7 +121,8 @@ const Register = () => {
                   required
                   aria-invalid={!validationMap.get('display_name')}
                 />
-                {!validationMap.get('display_name') && <FieldDescription className="text-red-500">{errorMessages.get('display_name')}</FieldDescription>}
+                {!validationMap.get('display_name') && <FieldDescription className="text-red-500">{registerErrorMessages.get('display_name')}</FieldDescription>}
+
               </Field>
               <Field className="grid gap-2">
                 <FieldLabel htmlFor="username">Username</FieldLabel>
@@ -110,19 +132,23 @@ const Register = () => {
                   name="username"
                   required
                   aria-invalid={!validationMap.get('username')}
+                  onChange={handleUsernameChange}
                 />
-                {!validationMap.get('username') && <FieldDescription className="text-red-500">{errorMessages.get('username')}</FieldDescription>}
+                {!validationMap.get('username') && <FieldDescription className="text-red-500">{registerErrorMessages.get('username')}</FieldDescription>}
+                {validationMap.get('username') && usernameMutation.isPending && <FieldDescription >Checking username... </FieldDescription>}
+                {validationMap.get('username') && !usernameMutation.isPending && usernameTaken && <FieldDescription className="text-red-500">Username already taken.</FieldDescription>}
+
               </Field>
               <Field className="grid gap-2">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input
-                  id="password"
+                  id="password"text-red-500
                   type="password"
                   name="password"
                   required
                   aria-invalid={!validationMap.get('password')}
                 />
-                {!validationMap.get('password') && <FieldDescription className="text-red-500">{errorMessages.get('password')}</FieldDescription>}
+                {!validationMap.get('password') && <FieldDescription className="text-red-500">{registerErrorMessages.get('password')}</FieldDescription>}
               </Field>
             </div>
           </FieldGroup>
@@ -130,6 +156,7 @@ const Register = () => {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button form="register-form" type="submit" className="w-full">
+          {registerMutation.isPending && <Spinner className="size-6" />}
           Register
         </Button>
         <div className="self-start">
