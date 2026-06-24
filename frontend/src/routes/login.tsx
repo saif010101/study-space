@@ -19,6 +19,7 @@ import {useMutation} from "@tanstack/react-query";
 import {UserAPIService} from "../services/UserAPIService.ts";
 import type {LoginFormData} from "../types/LoginFormData.ts";
 import {useState} from "react";
+import {Spinner} from "#components/ui/spinner";
 
 export const Login = () => {
 
@@ -37,7 +38,7 @@ export const Login = () => {
 
 
   return (
-    <Card className="grow max-w-[480px] justify-center border-1b max-[479px]:h-screen [--card-spacing:--spacing(10)]">
+    <Card className="grow max-w-[480px] justify-center border-1  max-[479px]:h-screen [--card-spacing:--spacing(10)]">
       <CardHeader>
         <CardTitle>Welcome Back!</CardTitle>
         <CardDescription>
@@ -50,13 +51,13 @@ export const Login = () => {
           <FieldGroup>
           <div className="flex flex-col gap-6">
             <Field className="grid gap-2">
-              <FieldLabel htmlFor="email">Username</FieldLabel>
-              <Input id="email" type="text" required aria-invalid={loginMutation.isError} />
+              <FieldLabel htmlFor="username">Username</FieldLabel>
+              <Input name="username" id="username" type="text" required aria-invalid={loginMutation.isError} className="border-gray-400"/>
               {loginMutation.isError && <FieldDescription className="text-red-500">Invalid username or password</FieldDescription>}
             </Field>
             <Field className="grid gap-2">
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required aria-invalid={loginMutation.isError} />
+              <Input name="password" id="password" type="password" required aria-invalid={loginMutation.isError} className="border-gray-400"/>
               {loginMutation.isError && <FieldDescription className="text-red-500">Invalid username or password</FieldDescription>}
             </Field>
           </div>
@@ -65,6 +66,7 @@ export const Login = () => {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button type="submit" form="login-form" className="w-full">
+          {loginMutation.isPending && <Spinner className="size-6" />}
           Login
         </Button>
         <div className="self-start">

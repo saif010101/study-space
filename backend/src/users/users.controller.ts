@@ -28,21 +28,19 @@ export class UsersController {
       throw new HttpException('Input is in invalid format.', HttpStatus.BAD_REQUEST);
     }
 
-    // Check if the user already exists in the database
-    const user = await this.usersService.getUser(createUserDto.username);
+    // check if email is already in use
+    const emailExists = await this.usersService.emailExists(createUserDto.email);
 
-    // If the user exists, return an error response
-    if (user) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    if (emailExists) {
+      throw new HttpException('Email already in use.', HttpStatus.BAD_REQUEST);
     }
 
-    // If the user does not exist, create a new user in the database
-    // Hash the password before saving it to the database
-    await this.usersService.createUser(createUserDto);
+    // Check if the user already exists in the database
+    const usernameExists = await this.usersService.getUser(createUserDto.username);
 
     // If the user exists, return an error response
-    if (user) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    if (usernameExists) {
+      throw new HttpException('Username already taken.', HttpStatus.BAD_REQUEST);
     }
 
     // If the user does not exist, create a new user in the database

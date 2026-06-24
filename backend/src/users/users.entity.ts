@@ -21,6 +21,7 @@ export class Users {
   @Column({
     type: 'varchar',
     length: 30,
+    unique: true
   })
   email: string;
 

@@ -8,7 +8,7 @@ export class UserAPIService {
     }
 
     static async loginUser(userData: LoginFormData): Promise<void> {
-        await axios.post('http://localhost:3000/api/v1/user/login', userData);
+        await axios.post('http://localhost:3000/api/v1/auth/login', userData);
     }
 
     static async getUser(username: string): Promise<void> {

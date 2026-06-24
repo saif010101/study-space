@@ -33,6 +33,14 @@ export class UsersService {
     });
   }
 
+  async emailExists(email: string) {
+    return await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+  }
+
   validateUserInput(createUserDto: CreateUserDto) {
     return registerFormSchema.safeParse(createUserDto);
   }

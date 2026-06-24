@@ -1,28 +1,18 @@
-import { Button } from "#components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "#components/ui/card";
+import {Button} from "#components/ui/button";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "#components/ui/card";
 
-import { Input } from "#components/ui/input";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "#components/ui/field";
-import { useState } from "react";
+import {Input} from "#components/ui/input";
+import {createFileRoute, Link} from "@tanstack/react-router";
+import {Field, FieldDescription, FieldGroup, FieldLabel,} from "#components/ui/field";
+import {useState} from "react";
 import {registerErrorMessages} from "../utils/registerErrorMessages.ts";
-import { registerFormSchema } from "../schemas/registerFormSchema.ts";
+import {registerFormSchema} from "../schemas/registerFormSchema.ts";
 import {useMutation} from "@tanstack/react-query";
 import {UserAPIService} from "../services/UserAPIService.ts";
 import type {RegisterFormData} from "../types/RegisterFormData.ts";
 import {Spinner} from "#components/ui/spinner";
+import {toast} from 'sonner';
+import {useNavigate} from "@tanstack/react-router";
 
 const initialErrorMapState = new Map([
   ["username", true],
@@ -33,10 +23,20 @@ const initialErrorMapState = new Map([
 
 
 const Register = () => {
+  const navigate = useNavigate();
   const [usernameTaken,setUsernameTaken] = useState(false);
   const [validationMap, setValidationMap] = useState(initialErrorMapState);
   const registerMutation = useMutation({
-    mutationFn: (userData: RegisterFormData) => UserAPIService.registerUser(userData)
+    mutationFn: (userData: RegisterFormData) => UserAPIService.registerUser(userData),
+    onSuccess: () => {
+      toast.success('Account created successfully, you may login now');
+      navigate({
+        to: '/login'
+      })
+    },
+    onError: (error : any) => {
+      toast.error(`Error: ${error.response.data.message}`);
+    }
   });
 
   const usernameMutation = useMutation({
@@ -105,6 +105,7 @@ const Register = () => {
                   name="email"
                   required
                   aria-invalid={!validationMap.get('email')}
+                  className="border-gray-400"
                 />
                 {!validationMap.get('email') && (
                   <FieldDescription className="text-red-500">
@@ -120,6 +121,7 @@ const Register = () => {
                   name="display_name"
                   required
                   aria-invalid={!validationMap.get('display_name')}
+                  className="border-gray-400"
                 />
                 {!validationMap.get('display_name') && <FieldDescription className="text-red-500">{registerErrorMessages.get('display_name')}</FieldDescription>}
 
@@ -133,6 +135,7 @@ const Register = () => {
                   required
                   aria-invalid={!validationMap.get('username')}
                   onChange={handleUsernameChange}
+                  className="border-gray-400"
                 />
                 {!validationMap.get('username') && <FieldDescription className="text-red-500">{registerErrorMessages.get('username')}</FieldDescription>}
                 {validationMap.get('username') && usernameMutation.isPending && <FieldDescription >Checking username... </FieldDescription>}
@@ -142,11 +145,12 @@ const Register = () => {
               <Field className="grid gap-2">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input
-                  id="password"text-red-500
+                  id="password"
                   type="password"
                   name="password"
                   required
                   aria-invalid={!validationMap.get('password')}
+                  className="border-gray-400"
                 />
                 {!validationMap.get('password') && <FieldDescription className="text-red-500">{registerErrorMessages.get('password')}</FieldDescription>}
               </Field>

@@ -1,10 +1,12 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { createRootRoute, Outlet } from '@tanstack/react-router';
+import {Toaster} from "#components/ui/sonner";
+
 
 const RootLayout = () => (
   <>
-    <Outlet />
-    <TanStackRouterDevtools />
+      <Outlet/>
+      <Toaster />
+    {/*<TanStackRouterDevtools />*/}
   </>
 )
 
