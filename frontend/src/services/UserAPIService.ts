@@ -4,7 +4,7 @@ import type {LoginFormData} from "../types/LoginFormData.ts";
 
 export class UserAPIService {
     static async registerUser(userData: RegisterFormData): Promise<void> {
-        await axios.post('http://localhost:3000/api/v1/user/register', userData);
+        await axios.post('http://localhost:3000/api/v1/users/register', userData);
     }
 
     static async loginUser(userData: LoginFormData): Promise<void> {
@@ -12,7 +12,7 @@ export class UserAPIService {
     }
 
     static async getUser(username: string): Promise<void> {
-        await axios.post(`http://localhost:3000/api/v1/user/get-user`, {username});
+        await axios.post(`http://localhost:3000/api/v1/users/get-user`, {username});
     }
 
 

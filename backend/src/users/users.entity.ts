@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Spaces } from '../spaces/spaces.entity';
 
 @Entity()
 export class Users {
@@ -36,4 +37,7 @@ export class Users {
     length: 100,
   })
   profile_url: string;
+
+  @OneToMany(() => Spaces, (space) => space.user)
+  spaces: Spaces[];
 }

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginUserDto } from '../users/dtos/login-user.dto';
 import type {Response} from 'express';
 
-@Controller('/api/v1/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

@@ -9,7 +9,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 
 
-@Controller('/api/v1/user')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

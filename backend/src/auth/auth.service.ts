@@ -33,7 +33,7 @@ export class AuthService {
     return await this.jwtService.signAsync({
       username: user.username,
       user_id: user.user_id,
-    },);
+    });
 
   }
 }

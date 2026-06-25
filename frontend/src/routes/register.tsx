@@ -29,7 +29,7 @@ const Register = () => {
   const registerMutation = useMutation({
     mutationFn: (userData: RegisterFormData) => UserAPIService.registerUser(userData),
     onSuccess: () => {
-      toast.success('Account created successfully, you may login now');
+      toast.success('Account created successfully.');
       navigate({
         to: '/login'
       })

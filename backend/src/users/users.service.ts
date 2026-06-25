@@ -21,7 +21,7 @@ export class UsersService {
       display_name: createUserDto.display_name,
       email: createUserDto.email,
       password: hashedPassword,
-      profile_url: 'harcoded for now fix later',
+      profile_url: 'hardcoded for now fix later',
     });
   }
 
