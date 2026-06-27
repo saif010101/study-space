@@ -13,18 +13,18 @@ import {Field, FieldDescription, FieldGroup} from "#components/ui/field";
 import { Label } from "#components/ui/label";
 import { Button } from "#components/ui/button";
 import {useState} from "react";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {SpaceAPIService} from "../services/SpaceAPIService.ts";
 import {toast} from "sonner";
 import {Spinner} from "#components/ui/spinner";
 import {useAppDispatch, useAppSelector} from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
-import {invalidateQuery} from "../utils/invalidateQuery.ts";
 
 
 export function EditSpaceDialog() {
 
 
+    const queryClient = useQueryClient();
     const dialog = useAppSelector((state) => state.dialogReducer.dialog);
     const dispatch = useAppDispatch();
     const currentSpace = useAppSelector(state => state.spaceReducer.space);
@@ -39,7 +39,7 @@ export function EditSpaceDialog() {
             setName('');
 
             // invalidate cache so that a refetch is trigger
-            await invalidateQuery(["spaces"]);
+            queryClient.invalidateQueries({queryKey: ["spaces"]});
 
         },
         onError: (error : any) => {

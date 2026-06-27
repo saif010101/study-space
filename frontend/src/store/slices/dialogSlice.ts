@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-type dialogType = "create-space" | "edit-space" | "none";
+type dialogType = "create-space" | "edit-space" | "delete-space-alert-dialog" | "none";
 
 const initialState: { dialog: dialogType } = {
   dialog: "none",

@@ -19,4 +19,8 @@ export class SpaceAPIService {
         await http.patch(`spaces/${space_id}`, { name });
     }
 
+    static async deleteSpace(space_id: number): Promise<void> {
+        await http.delete(`spaces/${space_id}`);
+    }
+
 }

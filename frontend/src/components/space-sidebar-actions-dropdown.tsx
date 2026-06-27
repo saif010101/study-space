@@ -23,7 +23,7 @@ export function SpaceSidebarActionsDropdown({ children }: PropsWithChildren) {
             <Pencil />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => dispatch(setDialog("delete-space-alert-dialog"))}>
             <Trash />
             Delete
           </DropdownMenuItem>
