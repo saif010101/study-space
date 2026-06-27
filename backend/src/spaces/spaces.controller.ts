@@ -20,9 +20,14 @@ interface NewResponse extends Response {
 export class SpacesController {
   constructor(private spacesServices: SpacesService) {}
 
+  private delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   @UseGuards(AuthGuard)
   @Get('/')
   async getSpaces(@Req() req: NewResponse) {
+    await this.delay(2000);
     return this.spacesServices.getSpaces(req.user_id);
   }
 
@@ -32,6 +37,8 @@ export class SpacesController {
     @Req() req: NewResponse,
     @Body() createSpaceDto: CreateSpaceDto,
   ) {
+
+    await this.delay(2000);
     // if user tries to create a space with empty name, throw an error
     if (createSpaceDto.name.trim().length === 0) {
       throw new HttpException('Space name is required', HttpStatus.BAD_REQUEST);

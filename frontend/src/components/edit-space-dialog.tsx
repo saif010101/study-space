@@ -1,38 +1,38 @@
-import {Input} from "#components/ui/input";
+import { Input } from "#components/ui/input";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "#components/ui/dialog";
 import {Field, FieldDescription, FieldGroup} from "#components/ui/field";
-import {Label} from "#components/ui/label";
-import {Button} from "#components/ui/button";
+import { Label } from "#components/ui/label";
+import { Button } from "#components/ui/button";
 import {useState} from "react";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {SpaceAPIService} from "../services/SpaceAPIService.ts";
 import {toast} from "sonner";
 import {Spinner} from "#components/ui/spinner";
+import {useSelector} from "react-redux";
+import type {RootState} from "../store";
 import {useAppDispatch, useAppSelector} from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
 
-export function CreateSpaceDialog () {
 
-    const queryClient = useQueryClient();
+export function EditSpaceDialog() {
+
     const dialog = useAppSelector((state) => state.dialogReducer.dialog);
     const dispatch = useAppDispatch();
-    const [name,setName] = useState<string>('');
+    const currentSpace = useSelector((state: RootState) => state.spaceReducer.space);
+    const [name,setName] = useState<string>(currentSpace.name);
     const spaceMutation = useMutation({
         mutationFn: () => SpaceAPIService.createSpace(name),
         onSuccess: () => {
-            // show success message
             toast.success('Space created successfully.');
-            // invalidate cache so that a refetch is trigger
-            queryClient.invalidateQueries({ queryKey: ["spaces"] });
             dispatch(setDialog("none"));
             setName('');
         },
@@ -52,15 +52,16 @@ export function CreateSpaceDialog () {
 
 
   return (
-    <Dialog open={dialog === "create-space"} >
+    <Dialog open={dialog === "edit-space"} >
       <form id="create-space-form" onSubmit={handleFormSubmit}>
         <DialogTrigger asChild>
+
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm" showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>Create Space</DialogTitle>
+            <DialogTitle>Edit Space</DialogTitle>
             <DialogDescription>
-              Fill in the details to create a new space.
+              Fill in the details to edit the space.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
@@ -81,7 +82,7 @@ export function CreateSpaceDialog () {
             </DialogClose>
               <Button form="create-space-form" disabled={name.trim().length === 0 || spaceMutation.isPending || name.trim().length > 50} type="submit">
                   {spaceMutation.isPending && <Spinner className="size-4" />}
-                  Create
+                  Edit
               </Button>
           </DialogFooter>
         </DialogContent>

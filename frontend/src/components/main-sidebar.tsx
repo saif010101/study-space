@@ -1,55 +1,83 @@
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup, SidebarGroupAction,
-    SidebarGroupContent, SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "#components/ui/sidebar";
-import {ChevronDown, Plus} from "lucide-react";
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "#components/ui/collapsible";
+import { ChevronDown, Plus, Settings } from "lucide-react";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "#components/ui/dialog";
-import {CreateSpaceDialog} from "#components/create-space-dialog";
-
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "#components/ui/collapsible";
+import { SpaceAPIService } from "../services/SpaceAPIService.ts";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "#components/ui/skeleton";
+import { SpaceSidebarActionsDropdown } from "#components/space-sidebar-actions-dropdown";
+import { useAppDispatch } from "../store/hooks.ts";
+import {setDialog} from "../store/slices/dialogSlice.ts";
 
 export function MainSidebar() {
-    return (
-        <Sidebar variant="inset">
-            <SidebarHeader>
-                Study Space
-            </SidebarHeader>
-            <SidebarContent>
-                <Collapsible defaultOpen className="group/collapsible">
-                    <SidebarGroup>
-                        <SidebarGroupLabel asChild>
-                            <CollapsibleTrigger>
-                                Spaces
-                                <ChevronDown className="ml-2 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                            </CollapsibleTrigger>
-                        </SidebarGroupLabel>
-                        <SidebarGroupAction>
-                            <CreateSpaceDialog />
-                        </SidebarGroupAction>
-                        <CollapsibleContent className="p-3">
-                            <SidebarGroupContent>Compiler Construction</SidebarGroupContent>
-                            <SidebarGroupContent>AI</SidebarGroupContent>
-                            <SidebarGroupContent>BDA</SidebarGroupContent>
-                        </CollapsibleContent>
-                    </SidebarGroup>
-                </Collapsible>
+  const dispatch = useAppDispatch();
+  const { data, isLoading, isSuccess } = useQuery({
+    queryKey: ["spaces"],
+    queryFn: () => SpaceAPIService.getSpaces(),
+  });
 
-            </SidebarContent>
-            <SidebarFooter>
-
-            </SidebarFooter>
-        </Sidebar>
-    )
+  return (
+    <Sidebar variant="inset">
+      <SidebarHeader>Study Space</SidebarHeader>
+      <SidebarContent>
+        <Collapsible defaultOpen className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                Spaces
+                <ChevronDown className="ml-2 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <SidebarGroupAction>
+              <Plus onClick={() => {dispatch(setDialog("create-space"))}} />
+            </SidebarGroupAction>
+            <CollapsibleContent className="p-3">
+              {isLoading && (
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-[20px] w-full rounded-full bg-gray-300" />
+                  <Skeleton className="h-[20px] w-full rounded-full bg-gray-300" />
+                  <Skeleton className="h-[20px] w-full rounded-full bg-gray-300" />
+                </div>
+              )}
+              <SidebarMenu>
+                {!isLoading &&
+                  isSuccess &&
+                  data.map((space) => (
+                    <SidebarMenuItem key={space.space_id}>
+                      <SidebarMenuButton
+                        isActive={space.space_id === data[0].space_id}
+                      >
+                        {space.name}
+                      </SidebarMenuButton>
+                      <SpaceSidebarActionsDropdown>
+                        <SidebarMenuAction showOnHover={true}>
+                          <Settings />
+                        </SidebarMenuAction>
+                      </SpaceSidebarActionsDropdown>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+              {!isLoading && !isSuccess && <span>Error loading spaces</span>}
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
+      </SidebarContent>
+      <SidebarFooter></SidebarFooter>
+    </Sidebar>
+  );
 }

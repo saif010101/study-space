@@ -1,18 +1,18 @@
-import axios from 'axios';
+import {http} from "./http.ts";
 import type {RegisterFormData} from "../types/RegisterFormData.ts";
 import type {LoginFormData} from "../types/LoginFormData.ts";
 
 export class UserAPIService {
     static async registerUser(userData: RegisterFormData): Promise<void> {
-        await axios.post('http://localhost:3000/api/v1/users/register', userData);
+        await http.post('users/register', userData);
     }
 
     static async loginUser(userData: LoginFormData): Promise<void> {
-        await axios.post('http://localhost:3000/api/v1/auth/login', userData);
+        await http.post('auth/login', userData);
     }
 
     static async getUser(username: string): Promise<void> {
-        await axios.post(`http://localhost:3000/api/v1/users/get-user`, {username});
+        await http.post('users/get-user', {username});
     }
 
 

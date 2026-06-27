@@ -20,6 +20,10 @@ export class SpacesService {
   }
   async getSpaces(user_id : number) {
     return this.spacesRepository.find({
+      select: {
+        space_id: true,
+        name: true
+      },
       where: {
         user: {
           user_id: user_id
