@@ -17,24 +17,30 @@ import {useMutation} from "@tanstack/react-query";
 import {SpaceAPIService} from "../services/SpaceAPIService.ts";
 import {toast} from "sonner";
 import {Spinner} from "#components/ui/spinner";
-import {useSelector} from "react-redux";
-import type {RootState} from "../store";
 import {useAppDispatch, useAppSelector} from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
+import {invalidateQuery} from "../utils/invalidateQuery.ts";
 
 
 export function EditSpaceDialog() {
 
+
     const dialog = useAppSelector((state) => state.dialogReducer.dialog);
     const dispatch = useAppDispatch();
-    const currentSpace = useSelector((state: RootState) => state.spaceReducer.space);
+    const currentSpace = useAppSelector(state => state.spaceReducer.space);
     const [name,setName] = useState<string>(currentSpace.name);
     const spaceMutation = useMutation({
-        mutationFn: () => SpaceAPIService.createSpace(name),
-        onSuccess: () => {
-            toast.success('Space created successfully.');
+        mutationFn: () => SpaceAPIService.editSpace(currentSpace.space_id, name),
+        onSuccess: async () => {
+            // show success message
+            toast.success('Space updated successfully.');
+
             dispatch(setDialog("none"));
             setName('');
+
+            // invalidate cache so that a refetch is trigger
+            await invalidateQuery(["spaces"]);
+
         },
         onError: (error : any) => {
             toast.error(`Error: ${error.response.data.message}`);
@@ -42,10 +48,9 @@ export function EditSpaceDialog() {
     });
 
 
-
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        toast.info('Creating space...');
+        toast.info('Updating space info....');
         spaceMutation.mutate();
 
     }
@@ -55,7 +60,6 @@ export function EditSpaceDialog() {
     <Dialog open={dialog === "edit-space"} >
       <form id="create-space-form" onSubmit={handleFormSubmit}>
         <DialogTrigger asChild>
-
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm" showCloseButton={false}>
           <DialogHeader>
@@ -78,7 +82,7 @@ export function EditSpaceDialog() {
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button onClick={() => dispatch(setDialog("none"))} variant="outline">Cancel</Button>
+              <Button disabled={spaceMutation.isPending} onClick={() => dispatch(setDialog("none"))} variant="outline">Cancel</Button>
             </DialogClose>
               <Button form="create-space-form" disabled={name.trim().length === 0 || spaceMutation.isPending || name.trim().length > 50} type="submit">
                   {spaceMutation.isPending && <Spinner className="size-4" />}

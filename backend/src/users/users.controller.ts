@@ -14,9 +14,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
 
-  private delay(ms : number) {
-    return new Promise((resolve) => setTimeout(resolve,ms));
-  }
+
 
   @Post('/register')
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -58,7 +56,6 @@ export class UsersController {
   @Post('/get-user')
   async getUser(@Body('username') username: string) {
 
-    await this.delay(2000);
     const user = await this.usersService.getUser(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

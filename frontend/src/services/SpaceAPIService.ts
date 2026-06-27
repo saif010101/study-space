@@ -15,4 +15,8 @@ export class SpaceAPIService {
         return response.data;
     }
 
+    static async editSpace(space_id: number, name: string): Promise<void> {
+        await http.patch(`spaces/${space_id}`, { name });
+    }
+
 }

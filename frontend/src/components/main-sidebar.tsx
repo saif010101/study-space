@@ -23,6 +23,7 @@ import { Skeleton } from "#components/ui/skeleton";
 import { SpaceSidebarActionsDropdown } from "#components/space-sidebar-actions-dropdown";
 import { useAppDispatch } from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
+import {setSpace} from "../store/slices/spaceSlice.ts";
 
 export function MainSidebar() {
   const dispatch = useAppDispatch();
@@ -65,8 +66,8 @@ export function MainSidebar() {
                         {space.name}
                       </SidebarMenuButton>
                       <SpaceSidebarActionsDropdown>
-                        <SidebarMenuAction showOnHover={true}>
-                          <Settings />
+                        <SidebarMenuAction  showOnHover={true}>
+                          <Settings onMouseEnter={() => dispatch(setSpace(space))}/>
                         </SidebarMenuAction>
                       </SpaceSidebarActionsDropdown>
                     </SidebarMenuItem>

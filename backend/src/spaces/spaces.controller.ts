@@ -4,6 +4,8 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -20,14 +22,11 @@ interface NewResponse extends Response {
 export class SpacesController {
   constructor(private spacesServices: SpacesService) {}
 
-  private delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+
 
   @UseGuards(AuthGuard)
   @Get('/')
   async getSpaces(@Req() req: NewResponse) {
-    await this.delay(2000);
     return this.spacesServices.getSpaces(req.user_id);
   }
 
@@ -38,7 +37,6 @@ export class SpacesController {
     @Body() createSpaceDto: CreateSpaceDto,
   ) {
 
-    await this.delay(2000);
     // if user tries to create a space with empty name, throw an error
     if (createSpaceDto.name.trim().length === 0) {
       throw new HttpException('Space name is required', HttpStatus.BAD_REQUEST);
@@ -54,4 +52,33 @@ export class SpacesController {
 
     return this.spacesServices.createSpace(req.user_id, createSpaceDto);
   }
+
+  @UseGuards(AuthGuard)
+  @Patch('/:space_id')
+  async editSpace(
+    @Body() createSpaceDto: CreateSpaceDto,
+    @Param('space_id') space_id: string
+  ) {
+
+    const parsedSpaceId = parseInt(space_id, 10);
+
+    if (!parsedSpaceId ) {
+      throw new HttpException('Space ID is not in a valid format.', HttpStatus.BAD_REQUEST);
+    }
+    // if user tries to create a space with empty name, throw an error
+    if (createSpaceDto.name.trim().length === 0) {
+      throw new HttpException('Space name is required', HttpStatus.BAD_REQUEST);
+    }
+
+    // if user tries to create a space with length greater than 50
+    if (createSpaceDto.name.trim().length > 50) {
+      throw new HttpException(
+        'Space name cannot exceed 50 characters.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.spacesServices.editSpace(parsedSpaceId,createSpaceDto);
+  }
+
 }

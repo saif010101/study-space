@@ -13,28 +13,32 @@ import {Field, FieldDescription, FieldGroup} from "#components/ui/field";
 import {Label} from "#components/ui/label";
 import {Button} from "#components/ui/button";
 import {useState} from "react";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {SpaceAPIService} from "../services/SpaceAPIService.ts";
 import {toast} from "sonner";
 import {Spinner} from "#components/ui/spinner";
 import {useAppDispatch, useAppSelector} from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
+import {invalidateQuery} from "../utils/invalidateQuery.ts";
 
 export function CreateSpaceDialog () {
 
-    const queryClient = useQueryClient();
     const dialog = useAppSelector((state) => state.dialogReducer.dialog);
     const dispatch = useAppDispatch();
     const [name,setName] = useState<string>('');
     const spaceMutation = useMutation({
         mutationFn: () => SpaceAPIService.createSpace(name),
-        onSuccess: () => {
+        onSuccess: async () => {
             // show success message
             toast.success('Space created successfully.');
-            // invalidate cache so that a refetch is trigger
-            queryClient.invalidateQueries({ queryKey: ["spaces"] });
+
+
             dispatch(setDialog("none"));
             setName('');
+
+            // invalidate cache so that a refetch is trigger
+            invalidateQuery(["spaces"]);
+
         },
         onError: (error : any) => {
             toast.error(`Error: ${error.response.data.message}`);
@@ -77,7 +81,7 @@ export function CreateSpaceDialog () {
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button onClick={() => dispatch(setDialog("none"))} variant="outline">Cancel</Button>
+              <Button disabled={spaceMutation.isPending} onClick={() => dispatch(setDialog("none"))} variant="outline">Cancel</Button>
             </DialogClose>
               <Button form="create-space-form" disabled={name.trim().length === 0 || spaceMutation.isPending || name.trim().length > 50} type="submit">
                   {spaceMutation.isPending && <Spinner className="size-4" />}
