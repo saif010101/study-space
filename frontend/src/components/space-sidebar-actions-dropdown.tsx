@@ -1,21 +1,23 @@
-import { Pencil, Trash } from "lucide-react";
+import {Pencil, Settings, Trash} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
+  DropdownMenuLabel, DropdownMenuTrigger,
 } from "#components/ui/dropdown-menu";
-import type { PropsWithChildren } from "react";
 import { useAppDispatch } from "../store/hooks.ts";
 import { setDialog } from "../store/slices/dialogSlice.ts";
 
-export function SpaceSidebarActionsDropdown({ children }: PropsWithChildren) {
+
+
+export function SpaceSidebarActionsDropdown() {
   const dispatch = useAppDispatch();
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+    <DropdownMenu >
+      <DropdownMenuTrigger >
+          <Settings className="size-5"/>
+      </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
@@ -23,7 +25,7 @@ export function SpaceSidebarActionsDropdown({ children }: PropsWithChildren) {
             <Pencil />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => dispatch(setDialog("delete-space-alert-dialog"))}>
+          <DropdownMenuItem variant="destructive" onClick={() => dispatch(setDialog("delete-space-alert-dialog"))}>
             <Trash />
             Delete
           </DropdownMenuItem>

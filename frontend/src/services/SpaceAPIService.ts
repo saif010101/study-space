@@ -1,8 +1,14 @@
 import {http} from "./http.ts";
 
 interface Space {
-    space_id:  number;
+    space_id: number;
     name: string;
+}
+
+interface UserSpace {
+    user_id:  number;
+    space_id: string;
+    space: Space;
 }
 
 export class SpaceAPIService {
@@ -10,7 +16,7 @@ export class SpaceAPIService {
         await http.post('spaces', { name });
     }
 
-    static async getSpaces(): Promise<Space[]> {
+    static async getSpaces(): Promise<UserSpace[]> {
         const response = await http.get('spaces');
         return response.data;
     }

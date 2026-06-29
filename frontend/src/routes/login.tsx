@@ -14,19 +14,21 @@ import {
   FieldGroup,
   FieldLabel,
 } from "#components/ui/field";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import {Link, createFileRoute, useNavigate} from "@tanstack/react-router";
 import {useMutation} from "@tanstack/react-query";
 import {UserAPIService} from "../services/UserAPIService.ts";
 import type {LoginFormData} from "../types/LoginFormData.ts";
-import {useState} from "react";
 import {Spinner} from "#components/ui/spinner";
 
 export const Login = () => {
 
-  // const [userInvalid,isUserInvalid] = useState(false)
+  const navigate = useNavigate();
 
   const loginMutation = useMutation({
-    mutationFn: (userData: LoginFormData) => UserAPIService.loginUser(userData)
+    mutationFn: (userData: LoginFormData) => UserAPIService.loginUser(userData),
+    onSuccess: () => {
+      navigate({ to: "/home" });
+    }
   });
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {

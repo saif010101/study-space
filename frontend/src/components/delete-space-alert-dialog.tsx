@@ -54,7 +54,7 @@ export function DeleteSpaceAlertDialog() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={spaceMutation.isPending} onClick={() => dispatch(setDialog("none"))}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction disabled={spaceMutation.isPending} onClick={handleDeleteClick} className="bg-red-700">
+                    <AlertDialogAction variant="destructive" disabled={spaceMutation.isPending} onClick={handleDeleteClick}>
                         {spaceMutation.isPending && <Spinner className="size-4" />}
                         Delete
                     </AlertDialogAction>

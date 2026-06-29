@@ -7,11 +7,10 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "#components/ui/sidebar";
-import { ChevronDown, Plus, Settings } from "lucide-react";
+import { ChevronDown, Plus} from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,17 +19,23 @@ import {
 import { SpaceAPIService } from "../services/SpaceAPIService.ts";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "#components/ui/skeleton";
-import { SpaceSidebarActionsDropdown } from "#components/space-sidebar-actions-dropdown";
 import { useAppDispatch } from "../store/hooks.ts";
 import {setDialog} from "../store/slices/dialogSlice.ts";
 import {setSpace} from "../store/slices/spaceSlice.ts";
+import {useState} from "react";
 
 export function MainSidebar() {
+  const [activeSpace, setActiveSpace] = useState<number>();
   const dispatch = useAppDispatch();
   const { data, isLoading, isSuccess } = useQuery({
     queryKey: ["spaces"],
     queryFn: () => SpaceAPIService.getSpaces(),
   });
+
+  const handleMenuItemClick = (space_id: number,name: string) => {
+    setActiveSpace(space_id);
+    dispatch(setSpace({space_id, name}));
+  }
 
   return (
     <Sidebar variant="inset">
@@ -58,18 +63,14 @@ export function MainSidebar() {
               <SidebarMenu>
                 {!isLoading &&
                   isSuccess &&
-                  data.map((space) => (
-                    <SidebarMenuItem key={space.space_id}>
+                  data.map((user_space) => (
+                    <SidebarMenuItem key={user_space.space.space_id}>
                       <SidebarMenuButton
-                        isActive={space.space_id === data[0].space_id}
+                        isActive={user_space.space.space_id === activeSpace}
+                        onClick={() => handleMenuItemClick(user_space.space.space_id, user_space.space.name)}
                       >
-                        {space.name}
+                        {user_space.space.name}
                       </SidebarMenuButton>
-                      <SpaceSidebarActionsDropdown>
-                        <SidebarMenuAction  showOnHover={true}>
-                          <Settings onMouseEnter={() => dispatch(setSpace(space))}/>
-                        </SidebarMenuAction>
-                      </SpaceSidebarActionsDropdown>
                     </SidebarMenuItem>
                   ))}
               </SidebarMenu>
